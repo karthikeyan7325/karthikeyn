@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Glaucoma Detection</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    .upload-box {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      display: inline-block;
+      margin-top: 30px;
+    }
+    input[type="file"] {
+      margin: 10px 0;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #preview {
+      margin-top: 20px;
+      max-width: 300px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+    }
+    #resultModal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background-color: white;
+      margin: auto;
+      padding: 30px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 500px;
+      border-radius: 10px;
+      text-align: left;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover {
+      color: black;
+    }
+    .glaucoma {
+      color: red;
+      font-weight: bold;
+    }
+    .normal {
+      color: green;
+      font-weight: bold;
+    }
+  </style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Glaucoma Detection</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: 100%;
+      max-width: 500px;
+      transition: all 0.3s ease;
+    }
+
+   h1 {
+  margin-bottom: 25px;
+  font-size: 2.2rem;
+  background: linear-gradient(to right, #fff, #a1c4fd);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+
+    .upload-area {
+      border: 2px dashed rgba(255, 255, 255, 0.4);
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .upload-area:hover {
+      border-color: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .upload-area i {
+      font-size: 50px;
+      margin-bottom: 15px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .file-label {
+      display: block;
+      cursor: pointer;
+    }
+
+    .file-info {
+      margin-top: 15px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.8);
+      word-break: break-all;
+    }
+
+    button {
+      background: linear-gradient(to right, #00ffaa, #00cc88);
+      border: none;
+      color: #000;
+      padding: 12px 30px;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0, 255, 170, 0.3);
+      margin-top: 15px;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 255, 170, 0.4);
+    }
+
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.3s;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 30px;
+      border-radius: 15px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 24px;
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.7);
+      transition: all 0.2s;
+    }
+
+    .close-modal:hover {
+      color: white;
+      transform: rotate(90deg);
+    }
+
+    .prediction-result {
+      font-size: 24px;
+      font-weight: bold;
+      margin: 20px 0;
+      padding: 15px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .glaucoma {
+      color: #ff6b6b;
+    }
+
+    .moderate {
+      color: #9c9797;
+    }
+
+    .normal {
+      color: #51cf66;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .pulse {
+      animation: pulse 1.5s infinite;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 id="mainHeading">Glaucoma Detection</h1>
+    
+    <div class="upload-area" id="uploadArea">
+      <label for="imageInput" class="file-label">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <p>Drag & drop your eye image or click to browse</p>
+        <div class="file-info" id="fileInfo">No file selected</div>
+      </label>
+      <input type="file" id="imageInput" class="file-input" accept="image/*" required />
+    </div>
+    
+    <button id="predictBtn" disabled>
+      <span id="btnText">Predict</span>
+      <span id="btnLoader" class="loading" style="display: none;"></span>
+    </button>
+  </div>
+
+  <div class="modal" id="resultModal">
+    <div class="modal-content">
+      <span class="close-modal" id="closeModal">&times;</span>
+      <h2>Prediction Result</h2>
+      <div class="prediction-result" id="predictionResult"></div>
+      <button id="okBtn">OK</button>
+    </div>
+  </div>
+
+  <script>
+    const imageInput = document.getElementById('imageInput');
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInfo = document.getElementById('fileInfo');
+    const predictBtn = document.getElementById('predictBtn');
+    const btnText = document.getElementById('btnText');
+    const btnLoader = document.getElementById('btnLoader');
+    const resultModal = document.getElementById('resultModal');
+    const predictionResult = document.getElementById('predictionResult');
+    const closeModal = document.getElementById('closeModal');
+    const okBtn = document.getElementById('okBtn');
+    const mainHeading = document.getElementById('mainHeading');
+
+    imageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        fileInfo.textContent = file.name;
+        predictBtn.disabled = false;
+        uploadArea.style.borderColor = "#00ffaa";
+      } else {
+        fileInfo.textContent = "No file selected";
+        predictBtn.disabled = true;
+        uploadArea.style.borderColor = "rgba(255, 255, 255, 0.4)";
+      }
+    });
+
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.style.borderColor = "#00ffaa";
+      uploadArea.style.backgroundColor = "rgba(0, 255, 170, 0.1)";
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.style.borderColor = imageInput.files.length ? "#00ffaa" : "rgba(255, 255, 255, 0.4)";
+      uploadArea.style.backgroundColor = "transparent";
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.style.borderColor = "#00ffaa";
+      uploadArea.style.backgroundColor = "transparent";
+      
+      if (e.dataTransfer.files.length) {
+        imageInput.files = e.dataTransfer.files;
+        fileInfo.textContent = e.dataTransfer.files[0].name;
+        predictBtn.disabled = false;
+      }
+    });
+
+    predictBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const file = imageInput.files[0];
+      if (!file) return;
+
+      btnText.textContent = "Processing";
+      btnLoader.style.display = "inline-block";
+      predictBtn.disabled = true;
+
+      const formData = new FormData();
+      formData.append('image', file);
+
+      try {
+        const response = await fetch('/predict', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || data.error) {
+          throw new Error(data.error || "Server error");
+        }
+
+        showResult(data);
+
+      } catch (err) {
+        predictionResult.innerHTML = `<span style="color: #ff6b6b">Error processing image. Please try again.<br>${err.message}</span>`;
+        resultModal.style.display = "flex";
+      } finally {
+        btnText.textContent = "Predict";
+        btnLoader.style.display = "none";
+        predictBtn.disabled = false;
+      }
+    });
+
+   function showResult(data) {
+  const isGlaucoma = data.result.toLowerCase() === "glaucoma";
+  const severity = data.cdr_severity.toLowerCase();
+
+  // Determine the color for glaucoma status
+  let glaucomaText = "";
+  if (isGlaucoma) {
+    // Change color based on severity
+    const color = severity === "moderate" ? "#413e3e" : "#ff6b6b";
+    glaucomaText = `<span style="color: ${color}; font-weight: bold; font-size: 20px;">⚠️ Glaucoma Detected</span>`;
+  } else {
+    glaucomaText = `<span style="color: #51cf66; font-weight: bold; font-size: 20px;">✅ Normal</span>`;
+  }
+
+  predictionResult.innerHTML = `
+    ${glaucomaText}
+    <p style="margin-top: 10px; font-size: 16px;">
+      ${isGlaucoma ? 'Potential glaucoma detected. Please consult an eye specialist.' : 'You are perfectly all right.'}
+    </p>
+    <p style="margin-top: 10px; font-size: 14px;">
+      <strong>Estimated CDR:</strong> ${data.cdr}<br>
+      <strong>Severity:</strong> ${data.cdr_severity}
+    </p>
+    ${isGlaucoma ? `
+      <p style="margin-top: 10px; font-size: 14px;">
+        <strong>Suggested Medicine:</strong> ${data.medicine}<br>
+        <strong>Consult:</strong> ${data.doctor_name} (${data.doctor_contact})
+      </p>
+    ` : ""}
+  `;
+  resultModal.style.display = "flex";
+}
+
+
+    function closeAndReset() {
+      resultModal.style.display = "none";
+      imageInput.value = "";
+      fileInfo.textContent = "No file selected";
+      predictBtn.disabled = true;
+      uploadArea.style.borderColor = "rgba(255, 255, 255, 0.4)";
+    }
+
+    closeModal.addEventListener('click', closeAndReset);
+    okBtn.addEventListener('click', closeAndReset);
+
+    window.addEventListener('click', (e) => {
+      if (e.target === resultModal) {
+        closeAndReset();
+      }
+    });
+  </script>
+</body>
+</html>
+
