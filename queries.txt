@@ -1,0 +1,32 @@
+ Create table payroll_management
+     (
+     reference VARCHAR(50) PRIMARY KEY,
+     Name VARCHAR(50),
+     Address VARCHAR(100),
+     Cityweighting VARCHAR(50),
+     Basic_salary VARCHAR(50),
+     Over_Time VARCHAR(50),
+     Gross_pay VARCHAR(50),
+     Pension VARCHAR(50),
+     Post_Code VARCHAR(50),
+     Gender VARCHAR(50),
+     Pay_Day VARCHAR(50),
+     Nett_pay VARCHAR(50),
+     Tax_code VARCHAR(50) REFERENCES Tax(Tax_code),
+     NI_Number VARCHAR(50) REFERENCES NI_pay(NI_Number)
+     );
+
+
+
+Create Table Tax
+     (
+     Tax_code VARCHAR(50) PRIMARY KEY,
+     Tax_Period VARCHAR(50),
+     Tax VARCHAR(50),
+     NI_Number VARCHAR(50) REFERENCES NI_pay(NI_Number)
+     );
+Create table NI_pay
+     (
+     NI_Number VARCHAR(50) PRIMARY KEY,
+     NI_Payments VARCHAR(50)
+     );
